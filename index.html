@@ -7,18 +7,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Value Calculator</title>
-  <style>
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
-    button { padding: 8px 12px; margin-top: 10px; }
-    input[type="number"], input[type="text"] { width: 100%; }
-  </style>
+  <link rel="stylesheet" href="style.css">
+  <title>PNL Calculator</title>
 </head>
 <body>
   <h1>Value Calculator</h1>
-
+<div id="calculatorContainer">
   <label>Port Total: <input type="number" id="portTotal" /></label>
   <br /><br />
 
@@ -49,6 +43,8 @@
 
   <h2>Total Value: <span id="totalValue">0</span></h2>
   <h2>Port % <span id="portdf">0</span></h2>
+
+  </div>
 
 <script>
   let storedRows = [];   // This replaces reading rows directly from the DOM

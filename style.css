@@ -1,0 +1,92 @@
+body { background: #1a0a3a; color: #fff; font-family: 'Poppins', sans-serif; display: flex; flex-direction: column; align-items: center; padding: 20px;}
+table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+h1{font-size: 2.5rem; font-weight: 700; background: linear-gradient(90deg, #ff00cc, #3333ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 20px;}
+button { padding: 8px 12px; margin-top: 10px; }
+input[type="number"], input[type="text"] { width: 100%; }
+
+#calculatorContainer{background: rgba(40, 10, 60, 0.9); border-radius: 20px; padding: 30px; width: 90%; max-width: 1000px; box-shadow: 0 0 30px rgba(255,0,255,0.3);}
+
+#dataTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  font-family: 'Arial', sans-serif;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  border-radius: 8px;
+  overflow: hidden;
+}
+#dataTable th {
+  background: linear-gradient(90deg, #ff00ff, #6600ff);
+  color: white;
+  font-weight: bold;
+  padding: 10px;
+  text-align: center;
+}
+
+/* Row Styling */
+#dataTable td {
+  background-color: #1a1a2e;
+  color: #eee;
+  padding: 8px;
+  text-align: center;
+  border-bottom: 1px solid #333;
+}
+
+/* Input fields in table */
+#dataTable input {
+  width: 90%;
+  padding: 4px;
+  border: 1px solid #555;
+  border-radius: 4px;
+  background-color: #2a2a40;
+  color: #fff;
+}
+
+/* Buttons inside table */
+#dataTable button {
+  background-color: #ff4081;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+#dataTable button:hover {
+  background-color: #e91e63;
+}
+
+/* Row hover effect */
+#dataTable tbody tr:hover {
+  background-color: #333366;
+}
+
+/* Port Total input styling */
+#calculatorContainer label {
+  display: flex;
+  align-items: center;
+  font-size: 1.2rem;
+  font-weight: 500;
+  margin-bottom: 20px;
+  color: #ffccff;
+  gap: 10px;
+}
+
+#calculatorContainer input#portTotal {
+  width: 100px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #ff66ff;
+  background-color: #2a1a3a;
+  color: #fff;
+  font-weight: 500;
+  transition: 0.2s;
+}
+
+#calculatorContainer input#portTotal:focus {
+  border-color: #ff00ff;
+  box-shadow: 0 0 10px #ff00ff80;
+  outline: none;
+}
