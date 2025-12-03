@@ -11,7 +11,7 @@
   <title>PNL Calculator</title>
 </head>
 <body>
-  <h1>Value Calculator</h1>
+  <h1>PNL Calculator</h1>
 <div id="calculatorContainer">
   <label>Port Total: <input type="number" id="portTotal" /></label>
   <br /><br />
@@ -26,6 +26,7 @@
         <th>CA</th>
         <th>DELETE</th>
         <th>PERCENTAGE</th>
+        <th>SOL PNL</th>
       </tr>
     </thead>
     <tbody></tbody>
@@ -98,7 +99,8 @@ function createRowHTML(data = {}) {
     <td><input type="number" value="${data.Valorentrada || 0}"></td>
     <td><input type="text" value="${data.CA || ''}"></td>
     <td><button onclick="deleteRow(this)">Delete</button></td>
-     <td class="percentCol">${data.percentagem || 0}%</td>
+     <td class="percentCol">${data.percentagem ? data.percentagem.toFixed(2) : 0}%</td>
+      <td class="">${ data.percentagem ? data.percentagem.toFixed(2)/100 *data.Valorentrada  : 0} SOL</td>
   `;
 
   tbody.appendChild(row);
@@ -148,7 +150,8 @@ async function backupData() {
     storedRows[realIndex].CA = cells[4].value;
     storedRows[realIndex].percentagem = storedRows[realIndex].MCentrada > 0 ?
       ((storedRows[realIndex].MCsaida - storedRows[realIndex].MCentrada) / storedRows[realIndex].MCentrada * 100) : 0;
-  });
+    storedRows[realIndex].solpnl = storedRows[realIndex].percentagem%100 * storedRows[realIndex].Valorentrada ;
+    });
 storedRows.push(data);
   renderTable();
   }
@@ -163,7 +166,9 @@ storedRows.push(data);
         Valorentrada: parseFloat(cells[3].value) || 0.0,
         CA: String(cells[4].value || ''),
         percentagem: parseFloat((parseFloat(cells[2].value)-parseFloat(cells[1].value))/parseFloat(cells[1].value)*100) || 0.0,
-        valorSaida:parseFloat(     parseFloat(cells[3].value)*(((parseFloat(cells[2].value)-parseFloat(cells[1].value))/parseFloat(cells[1].value)))                        ) || 0.0
+        valorSaida:parseFloat(     parseFloat(cells[3].value)*(((parseFloat(cells[2].value)-parseFloat(cells[1].value))/parseFloat(cells[1].value)))                        ) || 0.0,
+        solpnl: parseFloat(parseFloat((parseFloat(cells[2].value)-parseFloat(cells[1].value))/parseFloat(cells[1].value))*parseFloat(cells[3].value)) || 0.0
+      
       };
     });
     const port = document.getElementById('portTotal').value;
@@ -178,7 +183,9 @@ storedRows.push(data);
 
     console.log('Saved on server!');
         try{
+          
       calculate();
+      
     }
     catch (e){
       console.log("ERROR Calculating");
@@ -200,6 +207,8 @@ storedRows.push(data);
     storedRows[realIndex].CA = cells[4].value;
     storedRows[realIndex].percentagem = storedRows[realIndex].MCentrada > 0 ? 
         ((storedRows[realIndex].MCsaida - storedRows[realIndex].MCentrada) / storedRows[realIndex].MCentrada * 100) : 0;
+    storedRows[realIndex].solpnl = storedRows[realIndex].MCentrada > 0 ? 
+        ((storedRows[realIndex].MCsaida - storedRows[realIndex].MCentrada) / storedRows[realIndex].MCentrada ) *storedRows[realIndex].Valorentrada : 0;   
   });
     let total = 0;
 
@@ -207,11 +216,15 @@ storedRows.push(data);
       const MCentrada = parseFloat(r.MCentrada) || 0;
       const MCsaida = parseFloat(r.MCsaida) || 0;
       const Valorentrada = parseFloat(r.Valorentrada) || 0;
+      const percent = MCentrada > 0 ? ((MCsaida - MCentrada)/MCentrada*100) : 0;
+    const solpnl = MCentrada > 0 ? ((MCsaida - MCentrada)/MCentrada)*Valorentrada : 0;
 
       if (MCentrada > 0) {
         const val = Valorentrada * ( (MCsaida - MCentrada) / MCentrada);
         total += val;
       }
+    
+    
     });
 
     const port = parseFloat(document.getElementById('portTotal').value) || 0;
@@ -221,6 +234,8 @@ storedRows.push(data);
 
     document.getElementById('totalValue').innerText = total.toFixed(2);
     document.getElementById('portdf').innerText = pdf.toFixed(2);
+
+    renderTable();
     
   }
 function deleteRow(btn) {
