@@ -18,6 +18,26 @@ app.use(function(req, res, next) {
 const DATA_FILE = path.join(__dirname, 'data.json');
 
 
+app.get('/backup', (req, res) => {
+  try {
+    const dataPath = path.join(__dirname, 'data.json');
+    const backupDir = path.join(__dirname, 'backups');
+
+    if (!fs.existsSync(backupDir)) fs.mkdirSync(backupDir);
+
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const backupPath = path.join(backupDir, `data${timestamp}.json`);
+
+    const data = fs.readFileSync(dataPath, 'utf-8');
+    fs.writeFileSync(backupPath, data);
+
+    res.status(200).send({ message: 'Backup created', file: backupPath });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({ message: 'Backup failed' });
+  }
+});
+
 app.get('/load', (req, res) => {
 if (!fs.existsSync(DATA_FILE)) return res.json({ rows: [], portTotal: 0 });
 const data = JSON.parse(fs.readFileSync(DATA_FILE));

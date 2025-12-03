@@ -36,41 +36,111 @@
     </thead>
     <tbody></tbody>
   </table>
+  <div id="pagination" style="margin-top:10px;">
+  <button onclick="prevPage()">Prev</button>
+  <span id="pageInfo">Page 1</span>
+  <button onclick="nextPage()">Next</button>
+</div>
 
   <button onclick="addRow()">Add Row</button>
   <button onclick="saveData()">Save</button>
   <button onclick="calculate()">Calculate</button>
+  <button onclick="backupData()">Backup Data</button>
 
   <h2>Total Value: <span id="totalValue">0</span></h2>
+  <h2>Port % <span id="portdf">0</span></h2>
 
 <script>
+  let storedRows = [];   // This replaces reading rows directly from the DOM
+let currentPage = 1;
+const pageSize = 8;    // Number of entries per pag
   // Load data from server
   window.onload = async function() {
     const res = await fetch('http://localhost:3000/load');
     const data = await res.json();
 
-    if (data.rows) {
+     if (data.rows) storedRows = data.rows;
+ /*   if (data.rows) {
       data.rows.forEach(r => addRow(r));
       console.log(data);
     }
+      */
     if (data.portTotal) document.getElementById('portTotal').value = data.portTotal;
+
+    renderTable();
+
+
+    try{
+      calculate();
+    }
+    catch{
+      console.log("ERROR Calculating");
+    }
   }
 
+function renderTable() {
+  const tbody = document.querySelector('#dataTable tbody');
+  tbody.innerHTML = '';
+
+  const start = (currentPage - 1) * pageSize;
+  const pageRows = storedRows.slice(start, start + pageSize);
+
+  pageRows.forEach(r => createRowHTML(r));
+
+  const totalPages = Math.ceil(storedRows.length / pageSize) || 1;
+  document.getElementById('pageInfo').textContent = `Page ${currentPage} / ${totalPages}`;
+}
+
+function createRowHTML(data = {}) {
+  const tbody = document.querySelector('#dataTable tbody');
+  const row = document.createElement("tr");
+
+  row.innerHTML = `
+    <td><input type="text" value="${data.Name || ''}"></td>
+    <td><input type="number" value="${data.MCentrada || 0}"></td>
+    <td><input type="number" value="${data.MCsaida || 0}"></td>
+    <td><input type="number" value="${data.Valorentrada || 0}"></td>
+    <td><input type="text" value="${data.CA || ''}"></td>
+    <td><button onclick="deleteRow(this)">Delete</button></td>
+     <td class="percentCol">${data.percentagem || 0}%</td>
+  `;
+
+  tbody.appendChild(row);
+}
+
+function nextPage() {
+  const totalPages = Math.ceil(storedRows.length / pageSize);
+  if (currentPage < totalPages) {
+    currentPage++;
+    renderTable();
+  }
+}
+
+function prevPage() {
+  if (currentPage > 1) {
+    currentPage--;
+    renderTable();
+  }
+}
+
+
+async function backupData() {
+  try {
+    const res = await fetch('http://localhost:3000/backup');
+    if(res.ok){
+      alert('Backup created successfully!');
+    } else {
+      alert('Backup failed.');
+    }
+  } catch(err) {
+    console.error(err);
+    alert('Error creating backup.');
+  }
+}
+
   function addRow(data = {}) {
-    const tbody = document.querySelector('#dataTable tbody');
-    const row = document.createElement('tr');
-
-    row.innerHTML = `
-      <td><input type="text" value="${data.Name || ''}"></td>
-      <td><input type="number" value="${data.MCentrada || ''}"></td>
-      <td><input type="number" value="${data.MCsaida || ''}"></td>
-      <td><input type="number" value="${data.Valorentrada || ''}"></td>
-      <td><input type="text" value="${data.CA || ''}"></td>
-      <td><button onclick="deleteRow(this)">Delete</button></td>
-      <td><input readonly type="text" value="${data.percentagem || ''}"></td>
-    `;
-
-    tbody.appendChild(row);
+storedRows.push(data);
+  renderTable();
   }
 
   async function saveData() {
@@ -97,17 +167,23 @@
     });
 
     console.log('Saved on server!');
+        try{
+      calculate();
+    }
+    catch (e){
+      console.log("ERROR Calculating");
+      console.log(e);
+    }
   }
 
   function calculate() {
-    const rows = [...document.querySelectorAll('#dataTable tbody tr')];
+ //   const rows = [...document.querySelectorAll('#dataTable tbody tr')];
     let total = 0;
 
-    rows.forEach(r => {
-      const cells = r.querySelectorAll('input');
-      const MCentrada = parseFloat(cells[1].value) || 0;
-      const MCsaida = parseFloat(cells[2].value) || 0;
-      const Valorentrada = parseFloat(cells[3].value) || 0;
+    storedRows.forEach(r => {
+      const MCentrada = parseFloat(r.MCentrada) || 0;
+      const MCsaida = parseFloat(r.MCsaida) || 0;
+      const Valorentrada = parseFloat(r.Valorentrada) || 0;
 
       if (MCentrada > 0) {
         const val = Valorentrada * ( (MCsaida - MCentrada) / MCentrada);
@@ -118,12 +194,24 @@
     const port = parseFloat(document.getElementById('portTotal').value) || 0;
     total += port;
 
+    let pdf = (total-port)/port*100;
+
     document.getElementById('totalValue').innerText = total.toFixed(2);
+    document.getElementById('portdf').innerText = pdf.toFixed(2);
   }
-  function deleteRow(btn) {
-const row = btn.closest('tr');
-row.remove();
-saveData(); // automatically update backend after deletion
+function deleteRow(btn) {
+  const row = btn.closest("tr");
+
+  const rowIndex = [...row.parentNode.children].indexOf(row); // index inside page
+  const pageStart = (currentPage - 1) * pageSize;
+  const realIndex = pageStart + rowIndex;
+
+  if (realIndex > -1) {
+    storedRows.splice(realIndex, 1);
+  }
+
+  renderTable();
+  saveData();
 }
 </script>
 </body>
