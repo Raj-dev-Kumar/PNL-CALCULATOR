@@ -139,6 +139,20 @@ async function backupData() {
 }
 
   function addRow(data = {}) {
+      const rows = [...document.querySelectorAll('#dataTable tbody tr')];
+  rows.forEach((r, i) => {
+    const cells = r.querySelectorAll('input');
+    const pageStart = (currentPage - 1) * pageSize;
+    const realIndex = pageStart + i;
+
+    storedRows[realIndex].Name = cells[0].value;
+    storedRows[realIndex].MCentrada = parseFloat(cells[1].value) || 0;
+    storedRows[realIndex].MCsaida = parseFloat(cells[2].value) || 0;
+    storedRows[realIndex].Valorentrada = parseFloat(cells[3].value) || 0;
+    storedRows[realIndex].CA = cells[4].value;
+    storedRows[realIndex].percentagem = storedRows[realIndex].MCentrada > 0 ?
+      ((storedRows[realIndex].MCsaida - storedRows[realIndex].MCentrada) / storedRows[realIndex].MCentrada * 100) : 0;
+  });
 storedRows.push(data);
   renderTable();
   }
@@ -177,7 +191,20 @@ storedRows.push(data);
   }
 
   function calculate() {
- //   const rows = [...document.querySelectorAll('#dataTable tbody tr')];
+  const rows = [...document.querySelectorAll('#dataTable tbody tr')];
+  rows.forEach((r, i) => {
+    const cells = r.querySelectorAll('input');
+    const pageStart = (currentPage - 1) * pageSize;
+    const realIndex = pageStart + i;
+
+    storedRows[realIndex].Name = cells[0].value;
+    storedRows[realIndex].MCentrada = parseFloat(cells[1].value) || 0;
+    storedRows[realIndex].MCsaida = parseFloat(cells[2].value) || 0;
+    storedRows[realIndex].Valorentrada = parseFloat(cells[3].value) || 0;
+    storedRows[realIndex].CA = cells[4].value;
+    storedRows[realIndex].percentagem = storedRows[realIndex].MCentrada > 0 ? 
+        ((storedRows[realIndex].MCsaida - storedRows[realIndex].MCentrada) / storedRows[realIndex].MCentrada * 100) : 0;
+  });
     let total = 0;
 
     storedRows.forEach(r => {
@@ -198,6 +225,7 @@ storedRows.push(data);
 
     document.getElementById('totalValue').innerText = total.toFixed(2);
     document.getElementById('portdf').innerText = pdf.toFixed(2);
+    
   }
 function deleteRow(btn) {
   const row = btn.closest("tr");
