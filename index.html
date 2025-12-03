@@ -1,0 +1,133 @@
+<!-- Project: Value Calculator Website with Node.js + Express Backend -->
+<!-- Below is a full project code including frontend (index.html) and backend (server.js) -->
+
+<!-- ========================= index.html ========================= -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Value Calculator</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+    button { padding: 8px 12px; margin-top: 10px; }
+    input[type="number"], input[type="text"] { width: 100%; }
+  </style>
+</head>
+<body>
+  <h1>Value Calculator</h1>
+
+  <label>Port Total: <input type="number" id="portTotal" /></label>
+  <br /><br />
+
+  <table id="dataTable">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>MC Entrada</th>
+        <th>MC Saida</th>
+        <th>Valor Entrada</th>
+        <th>CA</th>
+        <th>DELETE</th>
+        <th>PERCENTAGE</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <button onclick="addRow()">Add Row</button>
+  <button onclick="saveData()">Save</button>
+  <button onclick="calculate()">Calculate</button>
+
+  <h2>Total Value: <span id="totalValue">0</span></h2>
+
+<script>
+  // Load data from server
+  window.onload = async function() {
+    const res = await fetch('http://localhost:3000/load');
+    const data = await res.json();
+
+    if (data.rows) {
+      data.rows.forEach(r => addRow(r));
+      console.log(data);
+    }
+    if (data.portTotal) document.getElementById('portTotal').value = data.portTotal;
+  }
+
+  function addRow(data = {}) {
+    const tbody = document.querySelector('#dataTable tbody');
+    const row = document.createElement('tr');
+
+    row.innerHTML = `
+      <td><input type="text" value="${data.Name || ''}"></td>
+      <td><input type="number" value="${data.MCentrada || ''}"></td>
+      <td><input type="number" value="${data.MCsaida || ''}"></td>
+      <td><input type="number" value="${data.Valorentrada || ''}"></td>
+      <td><input type="text" value="${data.CA || ''}"></td>
+      <td><button onclick="deleteRow(this)">Delete</button></td>
+      <td><input readonly type="text" value="${data.percentagem || ''}"></td>
+    `;
+
+    tbody.appendChild(row);
+  }
+
+  async function saveData() {
+    const rows = [...document.querySelectorAll('#dataTable tbody tr')].map(r => {
+      const cells = r.querySelectorAll('input');
+      return {
+        Name: String(cells[0].value || ''),
+        MCentrada: parseFloat(cells[1].value) || 0.0,
+        MCsaida: parseFloat(cells[2].value) || 0.0,
+        Valorentrada: parseFloat(cells[3].value) || 0.0,
+        CA: String(cells[4].value || ''),
+        percentagem: parseFloat((parseFloat(cells[2].value)-parseFloat(cells[1].value))/parseFloat(cells[1].value)*100) || 0.0,
+        valorSaida:parseFloat(     parseFloat(cells[3].value)*(((parseFloat(cells[2].value)-parseFloat(cells[1].value))/parseFloat(cells[1].value)))                        ) || 0.0
+      };
+    });
+    const port = document.getElementById('portTotal').value;
+//    const percentagem = (MCsaida-MCentrada)/MCentrada*100;
+   // const afetaValor = Valorentrada*(1+(MCsaida-MCentrada)/MCentrada*100);
+
+    await fetch('http://localhost:3000/save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ rows, portTotal: port })
+    });
+
+    console.log('Saved on server!');
+  }
+
+  function calculate() {
+    const rows = [...document.querySelectorAll('#dataTable tbody tr')];
+    let total = 0;
+
+    rows.forEach(r => {
+      const cells = r.querySelectorAll('input');
+      const MCentrada = parseFloat(cells[1].value) || 0;
+      const MCsaida = parseFloat(cells[2].value) || 0;
+      const Valorentrada = parseFloat(cells[3].value) || 0;
+
+      if (MCentrada > 0) {
+        const val = Valorentrada * ( (MCsaida - MCentrada) / MCentrada);
+        total += val;
+      }
+    });
+
+    const port = parseFloat(document.getElementById('portTotal').value) || 0;
+    total += port;
+
+    document.getElementById('totalValue').innerText = total.toFixed(2);
+  }
+  function deleteRow(btn) {
+const row = btn.closest('tr');
+row.remove();
+saveData(); // automatically update backend after deletion
+}
+</script>
+</body>
+</html>
+
+
+
