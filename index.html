@@ -20,9 +20,9 @@
     <thead>
       <tr>
         <th>Name</th>
-        <th>MC Entrada</th>
-        <th>MC Saida</th>
-        <th>Valor Entrada</th>
+        <th>Entry MC</th>
+        <th>OUT MC</th>
+        <th>Buy Value</th>
         <th>CA</th>
         <th>DELETE</th>
         <th>PERCENTAGE</th>
@@ -44,6 +44,7 @@
 
   <h2>Total Value: <span id="totalValue">0</span></h2>
   <h2>Port % <span id="portdf">0</span></h2>
+   <h2>Total PNL <span id="tpnl">0</span></h2>
 
   </div>
 
@@ -247,8 +248,9 @@ async function saveData() {
 
     let pdf = (total-port)/port*100;
 
-    document.getElementById('totalValue').innerText = total.toFixed(2);
+    document.getElementById('totalValue').innerText = total.toFixed(4);
     document.getElementById('portdf').innerText = pdf.toFixed(4);
+    document.getElementById('tpnl').innerText = (total.toFixed(4) - port.toFixed(4)).toFixed(4);
 
     renderTable();
     
