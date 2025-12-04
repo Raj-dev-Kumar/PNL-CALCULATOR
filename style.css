@@ -90,3 +90,40 @@ input[type="number"], input[type="text"] { width: 100%; }
   box-shadow: 0 0 10px #ff00ff80;
   outline: none;
 }
+
+
+/* General action buttons */
+.action-btn {
+    background: linear-gradient(135deg, #ff00ff, #6600ff);
+    border: none;
+    color: white;
+    padding: 10px 18px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    margin: 5px;
+    transition: 0.2s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+
+.action-btn:hover {
+    background: linear-gradient(135deg, #ff55ff, #884dff);
+    transform: translateY(-2px);
+}
+
+/* Pagination buttons */
+.page-btn {
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.25);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin: 0 6px;
+    backdrop-filter: blur(5px);
+    transition: 0.2s ease;
+}
+
+.page-btn:hover {
+    background: rgba(255,255,255,0.3);
+}
