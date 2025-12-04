@@ -82,29 +82,62 @@ function renderTable() {
   const start = (currentPage - 1) * pageSize;
   const pageRows = storedRows.slice(start, start + pageSize);
 
-  pageRows.forEach(r => createRowHTML(r));
+  pageRows.forEach((rowData, i) => {
+    const realIndex = start + i;
+    createRowHTML(rowData, realIndex);
+  });
 
   const totalPages = Math.ceil(storedRows.length / pageSize) || 1;
   document.getElementById('pageInfo').textContent = `Page ${currentPage} / ${totalPages}`;
 }
 
-function createRowHTML(data = {}) {
+
+function createRowHTML(data = {}, realIndex) {
   const tbody = document.querySelector('#dataTable tbody');
   const row = document.createElement("tr");
 
   row.innerHTML = `
-    <td><input type="text" value="${data.Name || ''}"></td>
-    <td><input type="number" value="${data.MCentrada || 0}"></td>
-    <td><input type="number" value="${data.MCsaida || 0}"></td>
-    <td><input type="number" value="${data.Valorentrada || 0}"></td>
-    <td><input type="text" value="${data.CA || ''}"></td>
+    <td><input type="text" data-field="Name" value="${data.Name || ''}"></td>
+    <td><input type="number" data-field="MCentrada" value="${data.MCentrada || 0}"></td>
+    <td><input type="number" data-field="MCsaida" value="${data.MCsaida || 0}"></td>
+    <td><input type="number" data-field="Valorentrada" value="${data.Valorentrada || 0}"></td>
+    <td><input type="text" data-field="CA" value="${data.CA || ''}"></td>
     <td><button onclick="deleteRow(this)">Delete</button></td>
-     <td class="percentCol">${data.percentagem ? data.percentagem.toFixed(2) : 0}%</td>
-      <td class="">${ data.percentagem ? data.percentagem.toFixed(2)/100 *data.Valorentrada  : 0} SOL</td>
+    <td class="percentCol">${data.percentagem ? data.percentagem.toFixed(2) : 0}%</td>
+    <td>${data.solpnl ? data.solpnl.toFixed(2) : 0} SOL</td>
   `;
+
+  const inputs = row.querySelectorAll('input');
+
+  inputs.forEach(input => {
+    input.addEventListener("input", () => {
+      updateStoredRow(realIndex, inputs);
+    });
+  });
 
   tbody.appendChild(row);
 }
+
+
+function updateStoredRow(realIndex, inputs) {
+  const row = storedRows[realIndex];
+
+  row.Name = inputs[0].value;
+  row.MCentrada = parseFloat(inputs[1].value) || 0;
+  row.MCsaida = parseFloat(inputs[2].value) || 0;
+  row.Valorentrada = parseFloat(inputs[3].value) || 0;
+  row.CA = inputs[4].value;
+
+  // Auto-calculated fields
+  row.percentagem = row.MCentrada > 0 
+    ? ((row.MCsaida - row.MCentrada) / row.MCentrada) * 100 
+    : 0;
+
+  row.solpnl = row.MCentrada > 0 
+    ? ((row.MCsaida - row.MCentrada) / row.MCentrada) * row.Valorentrada
+    : 0;
+}
+
 
 function nextPage() {
   const totalPages = Math.ceil(storedRows.length / pageSize);
@@ -156,42 +189,24 @@ storedRows.push(data);
   renderTable();
   }
 
-  async function saveData() {
-    const rows = [...document.querySelectorAll('#dataTable tbody tr')].map(r => {
-      const cells = r.querySelectorAll('input');
-      return {
-        Name: String(cells[0].value || ''),
-        MCentrada: parseFloat(cells[1].value) || 0.0,
-        MCsaida: parseFloat(cells[2].value) || 0.0,
-        Valorentrada: parseFloat(cells[3].value) || 0.0,
-        CA: String(cells[4].value || ''),
-        percentagem: parseFloat((parseFloat(cells[2].value)-parseFloat(cells[1].value))/parseFloat(cells[1].value)*100) || 0.0,
-        valorSaida:parseFloat(     parseFloat(cells[3].value)*(((parseFloat(cells[2].value)-parseFloat(cells[1].value))/parseFloat(cells[1].value)))                        ) || 0.0,
-        solpnl: parseFloat(parseFloat((parseFloat(cells[2].value)-parseFloat(cells[1].value))/parseFloat(cells[1].value))*parseFloat(cells[3].value)) || 0.0
-      
-      };
-    });
-    const port = document.getElementById('portTotal').value;
-//    const percentagem = (MCsaida-MCentrada)/MCentrada*100;
-   // const afetaValor = Valorentrada*(1+(MCsaida-MCentrada)/MCentrada*100);
+async function saveData() {
+  const port = document.getElementById('portTotal').value;
 
-    await fetch('http://localhost:3000/save', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ rows, portTotal: port })
-    });
+  await fetch('http://localhost:3000/save', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ rows: storedRows, portTotal: port })
+  });
 
-    console.log('Saved on server!');
-        try{
-          
-      calculate();
-      
-    }
-    catch (e){
-      console.log("ERROR Calculating");
-      console.log(e);
-    }
+  console.log('Saved on server!');
+
+  try {
+    calculate();
+  } catch (e) {
+    console.log("ERROR Calculating:", e);
   }
+}
+
 
   function calculate() {
   const rows = [...document.querySelectorAll('#dataTable tbody tr')];
