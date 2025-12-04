@@ -184,7 +184,7 @@ async function backupData() {
     storedRows[realIndex].CA = cells[4].value;
     storedRows[realIndex].percentagem = storedRows[realIndex].MCentrada > 0 ?
       ((storedRows[realIndex].MCsaida - storedRows[realIndex].MCentrada) / storedRows[realIndex].MCentrada * 100) : 0;
-    storedRows[realIndex].solpnl = storedRows[realIndex].percentagem%100 * storedRows[realIndex].Valorentrada ;
+    storedRows[realIndex].solpnl = storedRows[realIndex].percentagem/100 * storedRows[realIndex].Valorentrada ;
     });
 storedRows.push(data);
   renderTable();
