@@ -104,7 +104,7 @@ function createRowHTML(data = {}, realIndex) {
     <td><input type="text" data-field="CA" value="${data.CA || ''}"></td>
     <td><button onclick="deleteRow(this)">Delete</button></td>
     <td class="percentCol">${data.percentagem ? data.percentagem.toFixed(2) : 0}%</td>
-    <td>${data.solpnl ? data.solpnl.toFixed(2) : 0} SOL</td>
+    <td>${data.solpnl ? data.solpnl.toFixed(4) : 0} SOL</td>
   `;
 
   const inputs = row.querySelectorAll('input');
@@ -248,7 +248,7 @@ async function saveData() {
     let pdf = (total-port)/port*100;
 
     document.getElementById('totalValue').innerText = total.toFixed(2);
-    document.getElementById('portdf').innerText = pdf.toFixed(2);
+    document.getElementById('portdf').innerText = pdf.toFixed(4);
 
     renderTable();
     
