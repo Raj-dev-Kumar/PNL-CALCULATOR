@@ -76,6 +76,23 @@ const pageSize = 8;    // Number of entries per pag
     }
   }
 
+  function updateTotalPnlColor() {
+    const totalEl = document.getElementById("tpnl");
+    const value = parseFloat(totalEl.textContent);
+
+    // clear previous classes
+    totalEl.classList.remove("pnl-positive", "pnl-negative", "pnl-zero");
+
+    if (value > 0) {
+        totalEl.classList.add("pnl-positive");
+    } else if (value < 0) {
+        totalEl.classList.add("pnl-negative");
+    } else {
+        totalEl.classList.add("pnl-zero");
+    }
+}
+
+
 function renderTable() {
   const tbody = document.querySelector('#dataTable tbody');
   tbody.innerHTML = '';
@@ -251,6 +268,7 @@ async function saveData() {
     document.getElementById('totalValue').innerText = total.toFixed(4);
     document.getElementById('portdf').innerText = pdf.toFixed(4);
     document.getElementById('tpnl').innerText = (total.toFixed(4) - port.toFixed(4)).toFixed(4);
+    updateTotalPnlColor()
 
     renderTable();
     
