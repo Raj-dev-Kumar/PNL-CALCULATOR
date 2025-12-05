@@ -137,3 +137,17 @@ input[type="number"], input[type="text"] { width: 100%; }
 .pnl-negative {
     color: #FF6B6B; /* red */
 }
+
+.percgreenborder {
+    color: #7CFC9A;        /* your soft green */
+    border: 2px solid #7CFC9A;
+    padding: 2px 6px;
+    border-radius: 30px;
+}
+
+.percredborder {
+    color: #FF6B6B;        /* your soft red */
+    border: 2px solid #FF6B6B;
+    padding: 2px 6px;
+    border-radius: 30px;
+}

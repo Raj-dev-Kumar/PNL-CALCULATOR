@@ -113,6 +113,13 @@ function renderTable() {
 function createRowHTML(data = {}, realIndex) {
   const tbody = document.querySelector('#dataTable tbody');
   const row = document.createElement("tr");
+  let perctborder = "";
+  if (data.percentagem <0){
+    perctborder = "percredborder";
+  }
+  else if(data.percentagem >0){
+    perctborder = "percgreenborder";
+  }
 
   row.innerHTML = `
     <td><input type="text" data-field="Name" value="${data.Name || ''}"></td>
@@ -121,7 +128,7 @@ function createRowHTML(data = {}, realIndex) {
     <td><input type="number" data-field="Valorentrada" value="${data.Valorentrada || 0}"></td>
     <td><input type="text" data-field="CA" value="${data.CA || ''}"></td>
     <td><button onclick="deleteRow(this)">Delete</button></td>
-    <td class="percentCol">${data.percentagem ? data.percentagem.toFixed(2) : 0}%</td>
+    <td class="percentCol ${perctborder}">${data.percentagem ? data.percentagem.toFixed(2) : 0}%</td>
     <td>${data.solpnl ? data.solpnl.toFixed(4) : 0} SOL</td>
   `;
 
@@ -266,7 +273,7 @@ async function saveData() {
     let pdf = (total-port)/port*100;
 
     document.getElementById('totalValue').innerText = total.toFixed(4);
-    document.getElementById('portdf').innerText = pdf.toFixed(4);
+    document.getElementById('portdf').innerText = pdf.toFixed(2);
     document.getElementById('tpnl').innerText = (total.toFixed(4) - port.toFixed(4)).toFixed(4);
     updateTotalPnlColor()
 
